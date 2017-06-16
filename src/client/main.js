@@ -1,22 +1,41 @@
-import xs from 'xstream';
-import { run } from '@cycle/run';
-import { makeDOMDriver, div, input, p } from '@cycle/dom';
+import {run} from '@cycle/run';
+import {div, button, h1, h4, a, makeDOMDriver} from '@cycle/dom';
+import {makeHTTPDriver} from '@cycle/http';
 
 function main(sources) {
-    const sinks = {
-        DOM: sources.DOM.select('input').events('click')
-            .map(ev => ev.target.checked)
-            .startWith(false)
-            .map(toggled =>
-                div([
-                    input({attrs: {type: 'checkbox'}}), 'Toggle me',
-                    p(toggled ? 'ON' : 'off')
-                ])
-            )
+    const getRandomUser$ = sources.DOM.select('.get-random').events('click')
+        .map(() => {
+            const randomNum = Math.round(Math.random() * 9) + 1;
+            return {
+                url: 'https://jsonplaceholder.typicode.com/users/' + String(randomNum),
+                category: 'users',
+                method: 'GET'
+            };
+        });
+
+    const user$ = sources.HTTP.select('users')
+        .flatten()
+        .map(res => res.body)
+        .startWith(null);
+
+    const vdom$ = user$.map(user =>
+        div('.users', [
+            button('.get-random', 'Get random user'),
+            user === null ? null : div('.user-details', [
+                h1('.user-name', user.name),
+                h4('.user-email', user.email),
+                a('.user-website', {attrs: {href: user.website}}, user.website)
+            ])
+        ])
+    );
+
+    return {
+        DOM: vdom$,
+        HTTP: getRandomUser$
     };
-    return sinks;
 }
 
 run(main, {
-    DOM: makeDOMDriver("#root")
+    DOM: makeDOMDriver('#root'),
+    HTTP: makeHTTPDriver()
 });
