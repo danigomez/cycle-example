@@ -10,12 +10,8 @@
     "compile": "babel ./src/server -d ./src/dist",
     "postinstall": "yarn run clean && yarn run webpack && yarn run compile",
     "bs": "yarn install && yarn start",
-    "start": "node ./src/dist/index.js",
-    "prettier": "./node_modules/.bin/prettier --tab-width 4 --print-width 120 --single-quote --write 'src/**/*.js*'"
+    "start": "node ./src/dist/index.js"
   },
-  "pre-commit": [
-    "prettier"
-  ],
   "author": "DJG",
   "license": "ISC",
   "dependencies": {
