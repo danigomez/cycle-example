@@ -1,6 +1,9 @@
 import {run} from '@cycle/run';
 import {makeDOMDriver} from '@cycle/dom';
 
+import Store from '../shared/redux/store';
+import reducers from '../shared/redux/reducers'
+
 import Landing from '../shared/landing';
 
 function main(sources) {
@@ -15,4 +18,5 @@ function main(sources) {
 
 run(main, {
     DOM: makeDOMDriver('#root'),
+    STORE: new Store({}, reducers)
 });
